@@ -40,11 +40,15 @@ var numResult = proxy.getNumber();
 ```
 
 ###Interception & Invocation
-Interception is a simple callback function with single parameter of `Invocation`.
+Interception in Benalu simply a callback function with single parameter of `Invocation`.
 Invocation consist of 3 important members:
+
 1. `methodName` name of current invoked method. Usefull when you only want to intercept specific method of the class
+
 2. `args` arguments passed to the invoked method. Usefull when you want to get information of the arguments passed to the method.
+
 3. `proceed()` method to proceed current invocation. This method will invoke the method of the real object.
+
 4. `returnValue` return value of the current invoked method. this member filled automatically after the `proceed()` method called. You can override the return value of current invocation by suplying a value to the `returnValue` member
 
 ###Interception Priority
