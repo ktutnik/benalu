@@ -68,6 +68,3 @@ export class BenaluProxy{
         return (<Function>this.origin[methodName]).apply(this.origin, args);
     }
 }
-
-//export {Benalu, BenaluBuilder, BenaluProxy, Invocation};
-
