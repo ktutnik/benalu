@@ -9,6 +9,16 @@ class Stub{
     getString(){
         return STRING_RESULT;
     }
+    
+    getData(data){
+        return data;
+    }
 }
 
-export {Stub, NUMBER_RESULT, STRING_RESULT}
+class MultipleParameters{
+    substract(a:number, b:number){
+        return a - b;
+    }
+}
+
+export {Stub, MultipleParameters, NUMBER_RESULT, STRING_RESULT}
