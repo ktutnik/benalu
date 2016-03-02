@@ -7,7 +7,7 @@ generator with multiple interception.
 ###About
 The purpose of Benalu is provide a simple way to do a simple AOP in javascript. 
 Benalu also useful for IOC container library that hasn't support for interception
-like [Iversify 1.x](inversify.io)
+like [Inversify 1.x](http://inversify.io)
 
 ###How To Use It
 Using benalu is very simple. You start building your proxy by using `Benalu` builder
@@ -43,11 +43,14 @@ var numResult = proxy.getNumber();
 Interception in Benalu simply a callback function with single parameter of `Invocation`.
 Invocation consist of 3 important members:
 
-1. `methodName` name of current invoked method. Usefull when you only want to intercept specific method of the class
+1. `methodName` name of current invoked method. Usefull when you only want to intercept 
+specific method of the class
 
-2. `args` arguments passed to the invoked method. Usefull when you want to get information of the arguments passed to the method.
+2. `args` arguments passed to the invoked method. Usefull when you want to get 
+information of the arguments passed to the method.
 
-3. `proceed()` method to proceed current invocation. This method will invoke the method of the real object.
+3. `proceed()` method to proceed current invocation. This method will invoke the 
+method of the real object.
 
 4. `returnValue` return value of the current invoked method. this member filled automatically after the `proceed()` method called. You can override the return value of current invocation by suplying a value to the `returnValue` member
 

@@ -6,6 +6,12 @@
   "scripts": {
     "test": "mocha tests/**/*.js"
   },
+  "keywords": [
+      "proxy",
+      "dynamic proxy",
+      "typescript",
+      "interception"
+  ],
   "author": "ktutnik",
   "license": "MIT",
   "devDependencies": {

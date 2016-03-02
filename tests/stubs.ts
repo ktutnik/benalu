@@ -1,7 +1,7 @@
-const NUMBER_RESULT = 999;
-const STRING_RESULT = "THIS IS STRING_RESULT";
+export const NUMBER_RESULT = 999;
+export const STRING_RESULT = "THIS IS STRING_RESULT";
 
-class Stub{
+export class Stub{
     getNumber(){
         return NUMBER_RESULT;
     }
@@ -15,10 +15,8 @@ class Stub{
     }
 }
 
-class MultipleParameters{
+export class MultipleParameters{
     substract(a:number, b:number){
         return a - b;
     }
 }
-
-export {Stub, MultipleParameters, NUMBER_RESULT, STRING_RESULT}
