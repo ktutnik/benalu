@@ -1,6 +1,6 @@
 export class Invocation {
     methodName: string;
-    args: any[];
+    args: IArguments;
     returnValue: any;
     private realMethod: (methodName: string, args) => any;
     private thisArg: any;
@@ -16,16 +16,85 @@ export class Invocation {
     }
 }
 
+export interface IMemberProxyInfo {
+    origin: any;
+    memberName: string;
+    interceptors: Array<(invocation: Invocation) => void>;
+}
+
+export interface IMemberProxyStrategy {
+    getStrategy(info: IMemberProxyInfo);
+}
+
+export class MemberProxyStrategyFactory {
+    getMemberProxy(type: string) {
+        if (type == "function")
+            return new MethodProxyStrategy();
+        else
+            return new PropertyProxyStrategy();
+    }
+}
+
+
+export class MethodProxyStrategy implements IMemberProxyStrategy {
+    getStrategy(info: IMemberProxyInfo) {
+        return ((i: IMemberProxyInfo) => {
+            return function() {
+                if (i.interceptors.length == 0) {
+                    return invokeOriginalMember(i.memberName, arguments);
+                }
+                else {
+                    let lastResult;
+                    for (let intercept of i.interceptors) {
+                        let invocation = new Invocation(this, invokeOriginalMember)
+                        invocation.args = arguments;
+                        invocation.methodName = i.memberName;
+                        intercept.call(this, invocation);
+                        lastResult = invocation.returnValue;
+                    }
+                    return lastResult;
+                }
+            }
+
+            function invokeOriginalMember(methodName: string, args) {
+                return (<Function>i.origin[methodName]).apply(i.origin, args);
+            }
+        })(info);
+    }
+}
+
+export class PropertyProxyStrategy implements IMemberProxyStrategy {
+    getStrategy(info: IMemberProxyInfo) {
+        return info.origin[info.memberName];
+    }
+}
+
+
 export class BenaluBuilder<T> {
     origin: any;
-    intercepts: Array<(invocation: Invocation) => void> = []
+    intercepts: Array<(invocation: Invocation) => void> = [];
+    strategyFactory: MemberProxyStrategyFactory;
+
+    constructor() {
+        this.strategyFactory = new MemberProxyStrategyFactory();
+    }
+
     addInterception(interception: (invocation: Invocation) => void) {
         this.intercepts.push(interception);
         return this;
     }
+
     build(): T {
-        let proxy = new BenaluProxy(this.origin, this.intercepts);
-        return <T><any>proxy;
+        let proxy = new Object();
+        for (let key in this.origin) {
+            let strategy = this.strategyFactory.getMemberProxy(typeof this.origin[key]);
+            proxy[key] = strategy.getStrategy({
+                interceptors: this.intercepts,
+                origin: this.origin,
+                memberName: key
+            });
+        }
+        return <T>proxy;
     }
 }
 
@@ -37,44 +106,5 @@ export class Benalu {
     }
 }
 
-export class BenaluProxy {
-    origin: any;
-    interceptors: Array<(invoication: Invocation) => void>;
-    constructor(origin, interceptors: Array<(invocation: Invocation) => void>) {
-        this.origin = origin;
-        this.interceptors = interceptors;
-        for (let methodName in this.origin) {
-            if (typeof this.origin[methodName] === "function") {
-                this[methodName] = ((name) => {
-                    return function() {
-                        return this.__proxy_invoke(name, arguments)
-                    }
-                })(methodName);
-            }
-            else{
-                this[methodName] = this.origin[methodName];
-            }
-        }
-    }
 
-    __proxy_invoke(methodName: string, args) {
-        if (this.interceptors.length == 0) {
-            return this.__proxy_invokeOriginalMethod(methodName, args);
-        }
-        else {
-            let lastResult;
-            for (let intercept of this.interceptors) {
-                let invocation = new Invocation(this, this.__proxy_invokeOriginalMethod)
-                invocation.args = args;
-                invocation.methodName = methodName;
-                intercept.call(this, invocation);
-                lastResult = invocation.returnValue;
-            }
-            return lastResult;
-        }
-    }
 
-    __proxy_invokeOriginalMethod(methodName: string, args) {
-        return (<Function>this.origin[methodName]).apply(this.origin, args);
-    }
-}

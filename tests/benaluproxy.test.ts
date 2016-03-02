@@ -1,5 +1,5 @@
 import {Stub, MultipleParameters, NUMBER_RESULT, STRING_RESULT} from "./stubs";
-import {Benalu, BenaluBuilder, BenaluProxy, Invocation} from "../src/benalu";
+import {Benalu} from "../src/benalu";
 import * as Chai from "chai";
 
 describe("BenaluProxy", () => {
@@ -78,7 +78,7 @@ describe("BenaluProxy", () => {
         let stub = new MultipleParameters();
 
         let methodName;
-        let args: any[];
+        let args: IArguments;
         let returnValue;
 
         let proxy = Benalu.fromInstance(stub)
