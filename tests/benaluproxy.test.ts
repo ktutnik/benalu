@@ -78,7 +78,7 @@ describe("BenaluProxy", () => {
         let stub = new MultipleParameters();
 
         let methodName;
-        let args: IArguments;
+        let args: any[];
         let returnValue;
 
         let proxy = Benalu.fromInstance(stub)
