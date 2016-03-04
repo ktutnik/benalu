@@ -2,9 +2,9 @@ export class Invocation {
     methodName: string;
     args: any[];
     returnValue: any;
-    private info:InvocationInfo
+    private info:InterceptionInfo
 
-    constructor(info:InvocationInfo) {
+    constructor(info:InterceptionInfo) {
         this.info = info;
     }
 
@@ -13,31 +13,30 @@ export class Invocation {
     }
 }
 
-export class InvocationInfo {
+export class InterceptionInfo {
     origin: any;
     memberName: string;
+    interceptors: Array<(invocation: Invocation) => void>;
     invoke(args){
         return this.origin[this.memberName]
             .apply(this.origin, args)
     }
 }
 
-export class InvocationManager {
-    info: InvocationInfo;
-    interceptors: Array<(invocation: Invocation) => void>;
+export class InterceptionManager {
+    info: InterceptionInfo;
     
-    constructor(info: InvocationInfo, interceptors: Array<(invocation: Invocation) => void>) {
+    constructor(info: InterceptionInfo) {
         this.info = info;
-        this.interceptors = interceptors;
     }
 
-    private invoke(args) {
-        if (this.interceptors.length == 0) {
+    getResult(args) {
+        if (this.info.interceptors.length == 0) {
             return this.info.invoke(args);
         }
         else {
             let lastResult;
-            for (let intercept of this.interceptors) {
+            for (let intercept of this.info.interceptors) {
                 let invocation = new Invocation(this.info)
                 invocation.args = args;
                 invocation.methodName = this.info.memberName;
@@ -47,19 +46,10 @@ export class InvocationManager {
             return lastResult;
         }
     }
-    
-    invokeMethod(args){
-        return this.invoke(args);
-    }
-    
-    invokeProperty(args){
-        return this.info.origin[this.info.memberName];
-    }
 }
 
-
 export interface IMemberProxyStrategy {
-    getStrategy(info: InvocationInfo, interceptors: Array<(invocation: Invocation) => void>);
+    apply(proxy, info:InterceptionInfo);
 }
 
 export class MemberProxyStrategyFactory {
@@ -73,19 +63,19 @@ export class MemberProxyStrategyFactory {
 
 
 export class MethodProxyStrategy implements IMemberProxyStrategy {
-    getStrategy(info: InvocationInfo, interceptors: Array<(invocation: Invocation) => void>) {
-        return ((i: InvocationInfo) => {
+    apply(proxy, info:InterceptionInfo){
+        proxy[info.memberName] = ((info: InterceptionInfo) => {
             return function() {
-                var im = new InvocationManager(i, interceptors)
-                return im.invokeMethod(arguments);
+                var im = new InterceptionManager(info)
+                return im.getResult(arguments);
             }
         })(info);
     }
 }
 
 export class PropertyProxyStrategy implements IMemberProxyStrategy {
-    getStrategy(info: InvocationInfo, interceptors: Array<(invocation: Invocation) => void>) {
-        return info.origin[info.memberName];
+    apply(proxy, info:InterceptionInfo){
+        proxy[info.memberName] = info.origin[info.memberName];
     }
 }
 
@@ -95,7 +85,8 @@ export class BenaluBuilder<T> {
     intercepts: Array<(invocation: Invocation) => void> = [];
     strategyFactory: MemberProxyStrategyFactory;
 
-    constructor() {
+    constructor(origin) {
+        this.origin = origin
         this.strategyFactory = new MemberProxyStrategyFactory();
     }
 
@@ -108,10 +99,11 @@ export class BenaluBuilder<T> {
         let proxy = new Object();
         for (let key in this.origin) {
             let strategy = this.strategyFactory.getMemberProxy(typeof this.origin[key]);
-            var info = new InvocationInfo();
+            var info = new InterceptionInfo();
             info.memberName = key;
             info.origin = this.origin;
-            proxy[key] = strategy.getStrategy(info, this.intercepts);
+            info.interceptors = this.intercepts
+            strategy.apply(proxy, info);
         }
         return <T>proxy;
     }
@@ -119,8 +111,7 @@ export class BenaluBuilder<T> {
 
 export class Benalu {
     static fromInstance<T>(instance: T) {
-        let config = new BenaluBuilder<T>();
-        config.origin = instance;
+        let config = new BenaluBuilder<T>(instance);
         return config;
     }
 }

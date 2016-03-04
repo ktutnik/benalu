@@ -6,3 +6,4 @@ tests/*.js
 tests/*.js.map
 typings
 .DS_Store
+coverage

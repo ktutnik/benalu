@@ -7,18 +7,21 @@
     "test": "mocha tests/**/*.js"
   },
   "keywords": [
-      "proxy",
-      "dynamic proxy",
-      "typescript",
-      "interception"
+    "proxy",
+    "dynamic proxy",
+    "typescript",
+    "interception"
   ],
   "author": "ktutnik",
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
+    "gulp-coveralls": "^0.1.4",
+    "gulp-istanbul": "^0.10.3",
     "gulp-mocha": "^2.2.0",
     "gulp-typescript": "^2.12.0",
+    "run-sequence": "^1.1.5",
     "typescript": "^1.8.2"
   }
 }
