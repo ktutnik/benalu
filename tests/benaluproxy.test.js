@@ -72,7 +72,6 @@ describe("BenaluProxy", function () {
         var stub = new Stub();
         var proxy = benalu_1.Benalu.fromInstance(stub)
             .addInterception(function (i) {
-            i.proceed();
             i.returnValue = 999;
         })
             .addInterception(function (i) {
@@ -81,6 +80,47 @@ describe("BenaluProxy", function () {
             .build();
         var numResult = proxy.getNumber();
         Chai.expect(numResult).eq(444);
+    });
+    it("Should be able to intercept a getter", function () {
+        var original = {
+            data: 30
+        };
+        var memberType;
+        var proxy = benalu_1.Benalu.fromInstance(original)
+            .addInterception(function (i) {
+            i.returnValue = 999;
+            memberType = i.memberType;
+        })
+            .build();
+        var numResult = proxy.data;
+        Chai.expect(numResult).eq(999);
+        Chai.expect(memberType).eq(benalu_1.MemberType.Getter);
+    });
+    it("Should be able to intercept a setter", function () {
+        var original = {
+            data: 30
+        };
+        var memberType;
+        var proxy = benalu_1.Benalu.fromInstance(original)
+            .addInterception(function (i) {
+            memberType = i.memberType;
+        })
+            .build();
+        proxy.data = 200;
+        Chai.expect(memberType).eq(benalu_1.MemberType.Setter);
+    });
+    it("Should reflect original property change when original property internally changed", function () {
+        var original = {
+            data: 30,
+            changeData: function () {
+                this.data = 999;
+            }
+        };
+        var memberType;
+        var proxy = benalu_1.Benalu.fromInstance(original)
+            .build();
+        proxy.changeData();
+        Chai.expect(proxy.data).eq(999);
     });
 });
 //# sourceMappingURL=benaluproxy.test.js.map

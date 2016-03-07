@@ -1,31 +1,31 @@
 
-import {Benalu} from "../src/benalu";
+import {Benalu, MemberType} from "../src/benalu";
 import * as Chai from "chai";
 
 const NUMBER_RESULT = 999;
 const NEW_PROPERTY_RESULT = 8888;
 const STRING_RESULT = "THIS IS STRING_RESULT";
 
-class Stub{
+class Stub {
     property = NUMBER_RESULT;
-    
-    getNumber(){
+
+    getNumber() {
         return NUMBER_RESULT;
     }
-    
-    getString(){
+
+    getString() {
         return STRING_RESULT;
     }
-    
-    getData(data){
+
+    getData(data) {
         return data;
     }
-    
-    substract(a:number, b:number){
+
+    substract(a: number, b: number) {
         return a - b;
     }
-    
-    changeProperty(){
+
+    changeProperty() {
         this.property = NEW_PROPERTY_RESULT;
     }
 }
@@ -91,7 +91,6 @@ describe("BenaluProxy", () => {
 
         let proxy = Benalu.fromInstance(stub)
             .addInterception((i) => {
-                i.proceed();
                 i.returnValue = 999;
             })
             .addInterception((i) => {
@@ -103,4 +102,53 @@ describe("BenaluProxy", () => {
         Chai.expect(numResult).eq(444);
     });
 
+    it("Should be able to intercept a getter", () => {
+        let original = {
+            data: 30
+        };
+
+        let memberType;
+        let proxy = Benalu.fromInstance(original)
+            .addInterception((i) => {
+                i.returnValue = 999;
+                memberType = i.memberType;
+            })
+            .build();
+        let numResult = proxy.data;
+
+        Chai.expect(numResult).eq(999);
+        Chai.expect(memberType).eq(MemberType.Getter);
+    });
+
+    it("Should be able to intercept a setter", () => {
+        let original = {
+            data: 30
+        };
+
+        let memberType;
+        let proxy = Benalu.fromInstance(original)
+            .addInterception((i) => {
+                memberType = i.memberType;
+            })
+            .build();
+        proxy.data = 200;
+
+        Chai.expect(memberType).eq(MemberType.Setter);
+    });
+    
+    it("Should reflect original property change when original property internally changed", () => {
+        let original = {
+            data: 30,
+            changeData: function () {
+                this.data = 999;
+            }
+        };
+
+        let memberType;
+        let proxy = Benalu.fromInstance(original)
+            .build();
+        proxy.changeData();
+
+        Chai.expect(proxy.data).eq(999);
+    });
 });

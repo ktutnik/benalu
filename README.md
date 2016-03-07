@@ -10,6 +10,9 @@ The purpose of Benalu is provide a simple way to do a simple AOP in javascript.
 Benalu also useful for IOC container library that hasn't support for interception
 like [Inversify 1.x](http://inversify.io)
 
+###Features
+
+
 ###How To Use It
 Using benalu is very simple. You start building your proxy by using `Benalu` builder
 
