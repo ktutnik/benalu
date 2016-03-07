@@ -1,4 +1,5 @@
 #Benalu
+[![Build Status](https://travis-ci.org/ktutnik/benalu.svg?branch=master)](https://travis-ci.org/ktutnik/benalu)
 
 A dynamic proxy for javascript. 
 Provide a light weight [proxy class](https://en.wikipedia.org/wiki/Proxy_pattern)
