@@ -10,4 +10,6 @@ node_js:
 - '0.10'
 before_install:
 - npm install -g tsd
+- npm install -g typescript
 - tsd install
+- tsc
