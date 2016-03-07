@@ -3,9 +3,12 @@ import {Benalu} from "../src/benalu";
 import * as Chai from "chai";
 
 const NUMBER_RESULT = 999;
+const NEW_PROPERTY_RESULT = 8888;
 const STRING_RESULT = "THIS IS STRING_RESULT";
 
 class Stub{
+    property = NUMBER_RESULT;
+    
     getNumber(){
         return NUMBER_RESULT;
     }
@@ -20,6 +23,10 @@ class Stub{
     
     substract(a:number, b:number){
         return a - b;
+    }
+    
+    changeProperty(){
+        this.property = NEW_PROPERTY_RESULT;
     }
 }
 

@@ -90,5 +90,19 @@ describe("Strategy", () => {
             Chai.expect(obj.property).eq(OTHER_PROPERTY_VALUE);
             Chai.expect(stub.property).eq(OTHER_PROPERTY_VALUE);
         });
+        
+        it("Should able to change value from interceptor", () => {
+            var stub = new Stub();
+            var obj:any = new Object();
+            var strategy = new PropertyProxyStrategy();
+            strategy.apply(obj, {
+                interceptors: [(i) => {
+                    i.returnValue = OTHER_PROPERTY_VALUE;
+                }],
+                origin: stub,
+                memberName: "property",
+            });
+            Chai.expect(obj.property).eq(OTHER_PROPERTY_VALUE);
+        });
     })
 })

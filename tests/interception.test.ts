@@ -130,4 +130,47 @@ describe("Interception", () => {
         Chai.expect(result).eq("DIFFERENT_STRING_RESULT");
         Chai.expect(isCalled).eq(false);
     });
+    
+    it("Should call all interceptors on multiple interceptors", () => {
+        var stub = new Stub();
+
+        var isFirstCalled = false;
+        var isSecondCalled = false;
+        var interception = new Interception({
+            memberName: "getString",
+            interceptors: [(i) => {
+                isFirstCalled = true;
+            },
+            (i) => {
+                isSecondCalled = true;
+            }]
+        });
+
+        var result = interception.invoke(MemberType.Method, (args) => {
+            return stub.getString();
+        });
+
+        Chai.expect(isFirstCalled).eq(true);
+        Chai.expect(isSecondCalled).eq(true);
+    });
+    
+    it("Should return last returnValue on multiple interceptors", () => {
+        var stub = new Stub();
+
+        var interception = new Interception({
+            memberName: "getString",
+            interceptors: [(i) => {
+                i.returnValue = "DIFFERENT_STRING_RESULT"
+            },
+            (i) => {
+                i.returnValue = "OTHER_DIFFERENT_STRING_RESULT"
+            }]
+        });
+
+        var result = interception.invoke(MemberType.Method, (args) => {
+            return stub.getString();
+        });
+
+        Chai.expect(result).eq("OTHER_DIFFERENT_STRING_RESULT");
+    });
 });
