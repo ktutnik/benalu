@@ -1,6 +1,28 @@
-import {Stub, MultipleParameters, NUMBER_RESULT, STRING_RESULT} from "./stubs";
+
 import {Benalu} from "../src/benalu";
 import * as Chai from "chai";
+
+const NUMBER_RESULT = 999;
+const STRING_RESULT = "THIS IS STRING_RESULT";
+
+class Stub{
+    getNumber(){
+        return NUMBER_RESULT;
+    }
+    
+    getString(){
+        return STRING_RESULT;
+    }
+    
+    getData(data){
+        return data;
+    }
+    
+    substract(a:number, b:number){
+        return a - b;
+    }
+}
+
 
 describe("BenaluProxy", () => {
     it("Should create a perfect copy of prototype function", () => {
@@ -33,7 +55,7 @@ describe("BenaluProxy", () => {
     });
 
     it("Should proxy method with multiple parameters", () => {
-        let stub = new MultipleParameters();
+        let stub = new Stub();
 
         let proxy = Benalu.fromInstance(stub)
             .build();
@@ -74,26 +96,4 @@ describe("BenaluProxy", () => {
         Chai.expect(numResult).eq(444);
     });
 
-    it("Should provide correct information about invocation", () => {
-        let stub = new MultipleParameters();
-
-        let methodName;
-        let args: any[];
-        let returnValue;
-
-        let proxy = Benalu.fromInstance(stub)
-            .addInterception((i) => {
-                methodName = i.methodName;
-                args = i.args;
-                i.proceed();
-                returnValue = i.returnValue;
-            })
-            .build();
-        let numResult = proxy.substract(20, 10);
-
-        Chai.expect(methodName).eq("substract");
-        Chai.expect(args[0]).eq(20);
-        Chai.expect(args[1]).eq(10);
-        Chai.expect(returnValue).eq(10);
-    })
 });

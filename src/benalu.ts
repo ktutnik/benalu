@@ -1,81 +1,95 @@
-export class Invocation {
-    methodName: string;
-    args: any[];
-    returnValue: any;
-    private info:InterceptionInfo
-
-    constructor(info:InterceptionInfo) {
-        this.info = info;
-    }
-
-    proceed() {
-        this.returnValue = this.info.invoke(this.args);
-    }
+export enum MemberType {
+    Method, Getter, Setter
 }
 
-export class InterceptionInfo {
-    origin: any;
+export interface Invocation {
+    memberName: string;
+    parameters: IArguments;
+    returnValue?: any;
+    memberType: MemberType;
+    proceed();
+}
+
+export interface InterceptionInfo {
     memberName: string;
     interceptors: Array<(invocation: Invocation) => void>;
-    invoke(args){
-        return this.origin[this.memberName]
-            .apply(this.origin, args)
-    }
 }
 
-export class InterceptionManager {
-    info: InterceptionInfo;
-    
-    constructor(info: InterceptionInfo) {
+export interface MemberProxyStrategyInfo{
+    origin:any;
+    memberName:string;
+    interceptors: Array<(invocation: Invocation) => void>;
+}
+
+export interface MemberProxyStrategy {
+    apply(proxy, info: MemberProxyStrategyInfo)
+}
+
+export class Interception {
+    info:InterceptionInfo;
+    constructor(info:InterceptionInfo){
         this.info = info;
     }
-
-    getResult(args) {
+    
+    invoke(memberType:MemberType, originMemberInvoker: (parameters) => any,
+        parameters?:IArguments) {
         if (this.info.interceptors.length == 0) {
-            return this.info.invoke(args);
+            return originMemberInvoker(parameters);
         }
         else {
-            let lastResult;
-            for (let intercept of this.info.interceptors) {
-                let invocation = new Invocation(this.info)
-                invocation.args = args;
-                invocation.methodName = this.info.memberName;
-                intercept.call(this, invocation);
-                lastResult = invocation.returnValue;
+            let returnValue;
+            for (let interceptor of this.info.interceptors) {
+                let invocation: Invocation = {
+                    parameters: parameters,
+                    memberType: memberType,
+                    memberName: this.info.memberName,
+                    proceed: function() {
+                        this.returnValue =
+                            originMemberInvoker(parameters)
+                    }
+                };
+                interceptor(invocation);
+                returnValue = invocation.returnValue;
             }
-            return lastResult;
+            return returnValue;
         }
     }
 }
 
-export interface IMemberProxyStrategy {
-    apply(proxy, info:InterceptionInfo);
-}
-
-export class MemberProxyStrategyFactory {
-    getMemberProxy(type: string) {
-        if (type == "function")
-            return new MethodProxyStrategy();
-        else
-            return new PropertyProxyStrategy();
-    }
-}
-
-
-export class MethodProxyStrategy implements IMemberProxyStrategy {
-    apply(proxy, info:InterceptionInfo){
-        proxy[info.memberName] = ((info: InterceptionInfo) => {
+export class MethodProxyStrategy implements MemberProxyStrategy {
+    apply(proxy, info: MemberProxyStrategyInfo) {
+        proxy[info.memberName] = ((info: MemberProxyStrategyInfo) => {
             return function() {
-                var im = new InterceptionManager(info)
-                return im.getResult(arguments);
+                var interception = new Interception(info);
+                return interception.invoke(MemberType.Method, (parameters) => {
+                    return (<Function>info.origin[info.memberName]).apply(info.origin, parameters);
+                }, arguments)
             }
         })(info);
     }
 }
 
-export class PropertyProxyStrategy implements IMemberProxyStrategy {
-    apply(proxy, info:InterceptionInfo){
-        proxy[info.memberName] = info.origin[info.memberName];
+export class PropertyProxyStrategy implements MemberProxyStrategy {
+    apply(proxy, info: MemberProxyStrategyInfo) {
+        Object.defineProperty(proxy, info.memberName, {
+            enumerable: true,
+            get: ((info: MemberProxyStrategyInfo) => {
+                return function() {
+                    var interception = new Interception(info);
+                    return interception.invoke(MemberType.Getter, (parameters) => {
+                        return info.origin[info.memberName];
+                    });
+                }
+            })(info),
+            set: ((info: MemberProxyStrategyInfo) => {
+                return function() {
+                    var interception = new Interception(info);
+                    return interception.invoke(MemberType.Setter, (parameters) => {
+                        info.origin[info.memberName] = parameters[0];
+                    }, arguments);
+                }
+            })(info)
+        })
     }
 }
 
@@ -83,11 +97,9 @@ export class PropertyProxyStrategy implements IMemberProxyStrategy {
 export class BenaluBuilder<T> {
     origin: any;
     intercepts: Array<(invocation: Invocation) => void> = [];
-    strategyFactory: MemberProxyStrategyFactory;
 
     constructor(origin) {
         this.origin = origin
-        this.strategyFactory = new MemberProxyStrategyFactory();
     }
 
     addInterception(interception: (invocation: Invocation) => void) {
@@ -98,14 +110,24 @@ export class BenaluBuilder<T> {
     build(): T {
         let proxy = new Object();
         for (let key in this.origin) {
-            let strategy = this.strategyFactory.getMemberProxy(typeof this.origin[key]);
-            var info = new InterceptionInfo();
-            info.memberName = key;
-            info.origin = this.origin;
-            info.interceptors = this.intercepts
-            strategy.apply(proxy, info);
+            var memberType = typeof this.origin[key];
+            var strategy = this.getStrategy(memberType);
+            strategy.apply(proxy, {
+                memberName: key,
+                origin: this.origin,
+                interceptors: this.intercepts
+            });
         }
         return <T>proxy;
+    }
+
+    private getStrategy(memberType: string): MemberProxyStrategy {
+        if (memberType == "function") {
+            return new MethodProxyStrategy()
+        }
+        else {
+            return new PropertyProxyStrategy();
+        }
     }
 }
 
