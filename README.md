@@ -11,7 +11,11 @@ Benalu also useful for IOC container library that hasn't support for interceptio
 like [Inversify 1.x](http://inversify.io)
 
 ###Features
+1. Can proxy a Function prototype or an object.
 
+2. Can proxy method & property 
+
+3. Can add multiple
 
 ###How To Use It
 Using benalu is very simple. You start building your proxy by using `Benalu` builder

@@ -1,8 +1,8 @@
 {
   "name": "benalu",
   "version": "0.0.1",
-  "description": "Proxy class for AOP purposes",
-  "main": "index.js",
+  "description": "A dynamic proxy for javascript",
+  "main": "src/benalu.js",
   "scripts": {
     "test": "mocha tests/**/*.js"
   },
