@@ -1,5 +1,5 @@
 
-import {Benalu, MemberType} from "../src/benalu";
+import * as Benalu from "../src/benalu";
 import * as Chai from "chai";
 
 const NUMBER_RESULT = 999;
@@ -117,7 +117,7 @@ describe("BenaluProxy", () => {
         let numResult = proxy.data;
 
         Chai.expect(numResult).eq(999);
-        Chai.expect(memberType).eq(MemberType.Getter);
+        Chai.expect(memberType).eq(Benalu.MemberType.Getter);
     });
 
     it("Should be able to intercept a setter", () => {
@@ -133,7 +133,7 @@ describe("BenaluProxy", () => {
             .build();
         proxy.data = 200;
 
-        Chai.expect(memberType).eq(MemberType.Setter);
+        Chai.expect(memberType).eq(Benalu.MemberType.Setter);
     });
     
     it("Should reflect original property change when original property internally changed", () => {

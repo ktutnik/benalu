@@ -1,6 +1,6 @@
 {
   "name": "benalu",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A dynamic proxy for javascript",
   "main": "dist/benalu.js",
   "typings": "dist/benalu.d.ts",

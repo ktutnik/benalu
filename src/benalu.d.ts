@@ -41,6 +41,4 @@ export declare class BenaluBuilder<T> {
     build(): T;
     private getStrategy(memberType);
 }
-export declare class Benalu {
-    static fromInstance<T>(instance: T): BenaluBuilder<T>;
-}
+export declare function fromInstance<T>(instance: T): BenaluBuilder<T>;

@@ -131,11 +131,9 @@ export class BenaluBuilder<T> {
     }
 }
 
-export class Benalu {
-    static fromInstance<T>(instance: T) {
-        let config = new BenaluBuilder<T>(instance);
+export function fromInstance<T>(instance:T){
+    let config = new BenaluBuilder<T>(instance);
         return config;
-    }
 }
 
 

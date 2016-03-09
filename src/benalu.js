@@ -111,13 +111,8 @@ var BenaluBuilder = (function () {
     return BenaluBuilder;
 }());
 exports.BenaluBuilder = BenaluBuilder;
-var Benalu = (function () {
-    function Benalu() {
-    }
-    Benalu.fromInstance = function (instance) {
-        var config = new BenaluBuilder(instance);
-        return config;
-    };
-    return Benalu;
-}());
-exports.Benalu = Benalu;
+function fromInstance(instance) {
+    var config = new BenaluBuilder(instance);
+    return config;
+}
+exports.fromInstance = fromInstance;
