@@ -5,3 +5,4 @@ tests/*.js.map
 typings
 .DS_Store
 coverage
+dist

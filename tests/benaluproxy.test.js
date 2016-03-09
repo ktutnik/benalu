@@ -123,4 +123,3 @@ describe("BenaluProxy", function () {
         Chai.expect(proxy.data).eq(999);
     });
 });
-//# sourceMappingURL=benaluproxy.test.js.map
