@@ -13,6 +13,7 @@
     "typescript",
     "interception"
   ],
+  "homepage": "https://github.com/ktutnik/benalu",
   "author": "ktutnik",
   "license": "MIT",
   "devDependencies": {
