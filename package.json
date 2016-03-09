@@ -1,8 +1,9 @@
 {
   "name": "benalu",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "A dynamic proxy for javascript",
   "main": "src/benalu.js",
+  "typings": "type_definitions/benalu.d.ts",
   "scripts": {
     "test": "mocha tests/**/*.js"
   },
@@ -16,6 +17,13 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-istanbul": "^0.10.3",
+    "gulp-mocha": "^2.2.0",
+    "gulp-tslint": "^4.3.3",
+    "gulp-typescript": "^2.12.1",
+    "run-sequence": "^1.1.5",
+    "tslint": "^3.5.0",
     "typescript": "^1.8.2"
   }
 }

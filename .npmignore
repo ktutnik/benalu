@@ -1,0 +1,10 @@
+src
+tests
+typings
+coverage
+tsconfig.json
+tsd.json
+gulpfile.js
+.travis.yml
+.gitignore
+.vscode
