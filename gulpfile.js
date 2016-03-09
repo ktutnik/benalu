@@ -8,7 +8,7 @@ var gulp        = require("gulp"),
     mocha       = require("gulp-mocha"),
     istanbul    = require("gulp-istanbul")
 
-
+//******** BUILD *************
 gulp.task("lint", function() {
     
     var config =  { emitError: (process.env.CI) ? true : false };
@@ -51,15 +51,19 @@ gulp.task("build-test", function() {
     .js.pipe(gulp.dest("tests/"));
 });
 
-var tsTypeDefinitionsProject = tsc.createProject("tsconfig.json");
 
 gulp.task("build-type-definitions", function() {
-  return gulp.src("type_definitions/**/*.ts")
-             .pipe(tsc(tsTypeDefinitionsProject))
-             .on("error", function (err) {
-                 process.exit(1);
-             })
-             .js.pipe(gulp.dest("type_definitions/"));
+    return gulp.src([
+        "src/**/**.ts"
+    ])
+    .pipe(tsc({
+        declaration: true,
+        noExternalResolve:true,
+    }))
+    .on("error", function (err) {
+        process.exit(1);
+    })
+    .dts.pipe(gulp.dest("src/"));
 });
 
 gulp.task("build", function(cb) {
@@ -67,6 +71,7 @@ gulp.task("build", function(cb) {
 });
 
 
+//******** TEST *************
 gulp.task("mocha", function() {
   return gulp.src([
       "tests/**/*.test.js"
@@ -94,8 +99,9 @@ gulp.task("test", function(cb) {
 });
 
 
+//******** DISTRIBUTION *************
 gulp.task("dist", function() {
-  return gulp.src("src/benalu.js")
+  return gulp.src(["src/**/*.js", "src/**/*.d.ts"])
     .pipe(gulp.dest("dist/"));
 });
 

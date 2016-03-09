@@ -1,9 +1,9 @@
 {
   "name": "benalu",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "A dynamic proxy for javascript",
-  "main": "src/benalu.js",
-  "typings": "type_definitions/benalu.d.ts",
+  "main": "dist/benalu.js",
+  "typings": "dist/benalu.d.ts",
   "scripts": {
     "test": "mocha tests/**/*.js"
   },
