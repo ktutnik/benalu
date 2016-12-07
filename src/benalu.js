@@ -119,4 +119,3 @@ function fromInstance(instance) {
     return config;
 }
 exports.fromInstance = fromInstance;
-//# sourceMappingURL=benalu.js.map

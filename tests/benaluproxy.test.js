@@ -68,7 +68,7 @@ describe("BenaluProxy", function () {
         var numResult = proxy.getNumber();
         Chai.expect(numResult).eq(999);
     });
-    it.only("Should be able to use multiple interception", function () {
+    it("Should be able to use multiple interception", function () {
         var stub = new Stub();
         var proxy = Benalu.fromInstance(stub)
             .addInterception(function (i) {
@@ -125,4 +125,3 @@ describe("BenaluProxy", function () {
         Chai.expect(proxy.data).eq(999);
     });
 });
-//# sourceMappingURL=benaluproxy.test.js.map
