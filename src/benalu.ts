@@ -7,18 +7,18 @@ export interface Invocation {
     parameters: IArguments;
     returnValue?: any;
     memberType: MemberType;
-    proceed();
+    proceed():void;
 }
 
 export interface InterceptionInfo {
     memberName: string;
-    interceptors: Array<(invocation: Invocation) => void>;
+    interceptor: (invocation: Invocation) => void;
 }
 
 export interface MemberProxyStrategyInfo{
     origin:any;
     memberName:string;
-    interceptors: Array<(invocation: Invocation) => void>;
+    interceptor: (invocation: Invocation) => void;
 }
 
 export interface MemberProxyStrategy {
@@ -33,25 +33,21 @@ export class Interception {
     
     invoke(memberType:MemberType, originMemberInvoker: (parameters) => any,
         parameters?:IArguments) {
-        if (this.info.interceptors.length == 0) {
+        if (!this.info.interceptor) {
             return originMemberInvoker(parameters);
         }
         else {
-            let returnValue;
-            for (let interceptor of this.info.interceptors) {
-                let invocation: Invocation = {
-                    parameters: parameters,
-                    memberType: memberType,
-                    memberName: this.info.memberName,
-                    proceed: function() {
-                        this.returnValue =
-                            originMemberInvoker(parameters)
-                    }
-                };
-                interceptor(invocation);
-                returnValue = invocation.returnValue;
-            }
-            return returnValue;
+            let invocation: Invocation = {
+                parameters: parameters,
+                memberType: memberType,
+                memberName: this.info.memberName,
+                proceed: function() {
+                    this.returnValue =
+                        originMemberInvoker(parameters)
+                }
+            };
+            this.info.interceptor(invocation);
+            return invocation.returnValue;
         }
     }
 }
@@ -107,18 +103,26 @@ export class BenaluBuilder<T> {
         return this;
     }
 
-    build(): T {
+    private createProxy(origin:any, interceptor: (invocation: Invocation) => void) : T{
         let proxy = new Object();
-        for (let key in this.origin) {
-            var memberType = typeof this.origin[key];
+        for (let key in origin) {
+            var memberType = typeof origin[key];
             var strategy = this.getStrategy(memberType);
             strategy.apply(proxy, {
                 memberName: key,
-                origin: this.origin,
-                interceptors: this.intercepts
+                origin: origin,
+                interceptor: interceptor
             });
         }
         return <T>proxy;
+    }
+
+    build(): T {
+        let originObject = this.origin;
+        for(let interceptor of this.intercepts){
+            originObject = this.createProxy(originObject, interceptor);
+        }
+        return <T>originObject;
     }
 
     private getStrategy(memberType: string): MemberProxyStrategy {

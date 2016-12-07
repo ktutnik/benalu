@@ -18,7 +18,7 @@ describe("Interception", function () {
         var stub = new Stub();
         var interception = new benalu_1.Interception({
             memberName: "getString",
-            interceptors: []
+            interceptor: null
         });
         var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
             return stub.getString();
@@ -29,7 +29,7 @@ describe("Interception", function () {
         var stub = new Stub();
         var interception = new benalu_1.Interception({
             memberName: "substract",
-            interceptors: []
+            interceptor: null
         });
         var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
             return stub.substract(args[0], args[1]);
@@ -45,13 +45,13 @@ describe("Interception", function () {
         var methodType;
         var interception = new benalu_1.Interception({
             memberName: "substract",
-            interceptors: [function (i) {
-                    i.proceed();
-                    methodName = i.memberName;
-                    args = i.parameters;
-                    returnValue = i.returnValue;
-                    methodType = i.memberType;
-                }]
+            interceptor: function (i) {
+                i.proceed();
+                methodName = i.memberName;
+                args = i.parameters;
+                returnValue = i.returnValue;
+                methodType = i.memberType;
+            }
         });
         var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
             return stub.substract(args[0], args[1]);
@@ -67,7 +67,7 @@ describe("Interception", function () {
         var stub = new Stub();
         var interception = new benalu_1.Interception({
             memberName: "getString",
-            interceptors: []
+            interceptor: null
         });
         var isCalled = false;
         var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
@@ -81,10 +81,10 @@ describe("Interception", function () {
         var stub = new Stub();
         var interception = new benalu_1.Interception({
             memberName: "getString",
-            interceptors: [function (i) {
-                    i.proceed();
-                    i.returnValue = "DIFFERENT_STRING_RESULT";
-                }]
+            interceptor: function (i) {
+                i.proceed();
+                i.returnValue = "DIFFERENT_STRING_RESULT";
+            }
         });
         var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
             return stub.getString();
@@ -95,9 +95,9 @@ describe("Interception", function () {
         var stub = new Stub();
         var interception = new benalu_1.Interception({
             memberName: "getString",
-            interceptors: [function (i) {
-                    i.returnValue = "DIFFERENT_STRING_RESULT";
-                }]
+            interceptor: function (i) {
+                i.returnValue = "DIFFERENT_STRING_RESULT";
+            }
         });
         var isCalled = false;
         var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
@@ -107,39 +107,5 @@ describe("Interception", function () {
         Chai.expect(result).eq("DIFFERENT_STRING_RESULT");
         Chai.expect(isCalled).eq(false);
     });
-    it("Should call all interceptors on multiple interceptors", function () {
-        var stub = new Stub();
-        var isFirstCalled = false;
-        var isSecondCalled = false;
-        var interception = new benalu_1.Interception({
-            memberName: "getString",
-            interceptors: [function (i) {
-                    isFirstCalled = true;
-                },
-                function (i) {
-                    isSecondCalled = true;
-                }]
-        });
-        var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
-            return stub.getString();
-        });
-        Chai.expect(isFirstCalled).eq(true);
-        Chai.expect(isSecondCalled).eq(true);
-    });
-    it("Should return last returnValue on multiple interceptors", function () {
-        var stub = new Stub();
-        var interception = new benalu_1.Interception({
-            memberName: "getString",
-            interceptors: [function (i) {
-                    i.returnValue = "DIFFERENT_STRING_RESULT";
-                },
-                function (i) {
-                    i.returnValue = "OTHER_DIFFERENT_STRING_RESULT";
-                }]
-        });
-        var result = interception.invoke(benalu_1.MemberType.Method, function (args) {
-            return stub.getString();
-        });
-        Chai.expect(result).eq("OTHER_DIFFERENT_STRING_RESULT");
-    });
 });
+//# sourceMappingURL=interception.test.js.map

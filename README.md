@@ -8,7 +8,6 @@ generator with multiple interception.
 ###About
 The purpose of Benalu is provide a simple way to do a simple AOP in javascript. 
 Benalu also useful for IOC container library that hasn't support for interception
-like [Inversify 1.x](http://inversify.io)
 
 ###Features
 1. Can proxy a Function prototype or an object.
@@ -26,6 +25,8 @@ npm install benalu
 Using benalu is very simple. You start building your proxy by using `Benalu` builder
 
 ```Javascript
+var Benalu = require('benalu');
+
 //declare the class
 function MyObject(){}
 MyObject.prototype.getNumber = function(){
@@ -69,7 +70,49 @@ method of the real object.
 automatically after the `proceed()` method called. You can override the return value 
 of current invocation by suplying a value to the `returnValue` member
 
-###Interception Priority
-Interception can be applied more than one in a proxy. The last inserted interceptor 
-having the most priority. If the last interceptor change the return value of Invocation 
-then all previous override will be ignored.
+###Multiple Interception
+Benalu also support multiple interception. 
+
+```Javascript
+var Benalu = require('benalu');
+
+function MyObject(){}
+MyObject.prototype.getNumber = function(){
+    console.log("The real method called");
+    return 700;
+}
+
+var myObject = new MyObject();
+     
+var proxy = Benalu.fromInstance(myObject)
+    .addInterception(function(i) {
+        if(i.methodName == "getNumber"){
+            console.log("First interceptor before proceed");
+            i.proceed();
+            console.log("First interceptor after proceed");
+            i.returnValue = 300;
+        }
+    })
+    .addInterception(function(i) {
+        if(i.methodName == "getNumber"){
+            console.log("Second interceptor before proceed");
+            i.proceed();
+            console.log("Second interceptor after proceed");
+            i.returnValue = i.returnValue + 300;
+        }
+    })
+    .build();
+    
+var numResult = proxy.getNumber();
+//numResult = 600
+```
+
+Above code will write log in the console like below:
+
+```
+Second interceptor before proceed
+First interceptor before proceed
+The real method called
+First interceptor after proceed
+Second interceptor after proceed
+```

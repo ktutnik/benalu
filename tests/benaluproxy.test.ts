@@ -86,20 +86,22 @@ describe("BenaluProxy", () => {
         Chai.expect(numResult).eq(999);
     });
 
-    it("Should be able to use multiple interception", () => {
+    it.only("Should be able to use multiple interception", () => {
         let stub = new Stub();
 
         let proxy = Benalu.fromInstance(stub)
             .addInterception((i) => {
-                i.returnValue = 999;
+                i.proceed();
+                i.returnValue = 1;
             })
             .addInterception((i) => {
-                i.returnValue = 444;
+                i.proceed();
+                i.returnValue = i.returnValue + 1;
             })
             .build();
         let numResult = proxy.getNumber();
 
-        Chai.expect(numResult).eq(444);
+        Chai.expect(numResult).eq(2);
     });
 
     it("Should be able to intercept a getter", () => {

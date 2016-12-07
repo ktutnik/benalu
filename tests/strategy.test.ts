@@ -24,7 +24,7 @@ describe("Strategy", () => {
             var obj:any = new Object();
             var strategy = new MethodProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "getString",
             });
@@ -37,10 +37,10 @@ describe("Strategy", () => {
             var obj:any = new Object();
             var strategy = new MethodProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [(i) => {
+                interceptor: (i) => {
                     i.proceed();
                     i.returnValue = "DIFFERENT_STRING_RESULT"
-                }],
+                },
                 origin: stub,
                 memberName: "getString",
             });
@@ -55,7 +55,7 @@ describe("Strategy", () => {
             var obj:any = new Object();
             var strategy = new PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "property",
             });
@@ -68,7 +68,7 @@ describe("Strategy", () => {
             var obj:any = new Object();
             var strategy = new PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "property",
             });
@@ -82,7 +82,7 @@ describe("Strategy", () => {
             var obj:any = new Object();
             var strategy = new PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "property",
             });
@@ -96,9 +96,9 @@ describe("Strategy", () => {
             var obj:any = new Object();
             var strategy = new PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [(i) => {
+                interceptor: (i) => {
                     i.returnValue = OTHER_PROPERTY_VALUE;
-                }],
+                },
                 origin: stub,
                 memberName: "property",
             });

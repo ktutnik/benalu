@@ -8,16 +8,16 @@ export interface Invocation {
     parameters: IArguments;
     returnValue?: any;
     memberType: MemberType;
-    proceed(): any;
+    proceed(): void;
 }
 export interface InterceptionInfo {
     memberName: string;
-    interceptors: Array<(invocation: Invocation) => void>;
+    interceptor: (invocation: Invocation) => void;
 }
 export interface MemberProxyStrategyInfo {
     origin: any;
     memberName: string;
-    interceptors: Array<(invocation: Invocation) => void>;
+    interceptor: (invocation: Invocation) => void;
 }
 export interface MemberProxyStrategy {
     apply(proxy: any, info: MemberProxyStrategyInfo): any;
@@ -38,6 +38,7 @@ export declare class BenaluBuilder<T> {
     intercepts: Array<(invocation: Invocation) => void>;
     constructor(origin: any);
     addInterception(interception: (invocation: Invocation) => void): this;
+    private createProxy(origin, interceptor);
     build(): T;
     private getStrategy(memberType);
 }

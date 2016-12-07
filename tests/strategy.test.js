@@ -23,7 +23,7 @@ describe("Strategy", function () {
             var obj = new Object();
             var strategy = new benalu_1.MethodProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "getString",
             });
@@ -35,10 +35,10 @@ describe("Strategy", function () {
             var obj = new Object();
             var strategy = new benalu_1.MethodProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [function (i) {
-                        i.proceed();
-                        i.returnValue = "DIFFERENT_STRING_RESULT";
-                    }],
+                interceptor: function (i) {
+                    i.proceed();
+                    i.returnValue = "DIFFERENT_STRING_RESULT";
+                },
                 origin: stub,
                 memberName: "getString",
             });
@@ -52,7 +52,7 @@ describe("Strategy", function () {
             var obj = new Object();
             var strategy = new benalu_1.PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "property",
             });
@@ -64,7 +64,7 @@ describe("Strategy", function () {
             var obj = new Object();
             var strategy = new benalu_1.PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "property",
             });
@@ -77,7 +77,7 @@ describe("Strategy", function () {
             var obj = new Object();
             var strategy = new benalu_1.PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [],
+                interceptor: null,
                 origin: stub,
                 memberName: "property",
             });
@@ -90,9 +90,9 @@ describe("Strategy", function () {
             var obj = new Object();
             var strategy = new benalu_1.PropertyProxyStrategy();
             strategy.apply(obj, {
-                interceptors: [function (i) {
-                        i.returnValue = OTHER_PROPERTY_VALUE;
-                    }],
+                interceptor: function (i) {
+                    i.returnValue = OTHER_PROPERTY_VALUE;
+                },
                 origin: stub,
                 memberName: "property",
             });
@@ -100,3 +100,4 @@ describe("Strategy", function () {
         });
     });
 });
+//# sourceMappingURL=strategy.test.js.map

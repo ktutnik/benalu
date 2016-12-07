@@ -10,26 +10,21 @@ var Interception = (function () {
         this.info = info;
     }
     Interception.prototype.invoke = function (memberType, originMemberInvoker, parameters) {
-        if (this.info.interceptors.length == 0) {
+        if (!this.info.interceptor) {
             return originMemberInvoker(parameters);
         }
         else {
-            var returnValue = void 0;
-            for (var _i = 0, _a = this.info.interceptors; _i < _a.length; _i++) {
-                var interceptor = _a[_i];
-                var invocation = {
-                    parameters: parameters,
-                    memberType: memberType,
-                    memberName: this.info.memberName,
-                    proceed: function () {
-                        this.returnValue =
-                            originMemberInvoker(parameters);
-                    }
-                };
-                interceptor(invocation);
-                returnValue = invocation.returnValue;
-            }
-            return returnValue;
+            var invocation = {
+                parameters: parameters,
+                memberType: memberType,
+                memberName: this.info.memberName,
+                proceed: function () {
+                    this.returnValue =
+                        originMemberInvoker(parameters);
+                }
+            };
+            this.info.interceptor(invocation);
+            return invocation.returnValue;
         }
     };
     return Interception;
@@ -87,18 +82,26 @@ var BenaluBuilder = (function () {
         this.intercepts.push(interception);
         return this;
     };
-    BenaluBuilder.prototype.build = function () {
+    BenaluBuilder.prototype.createProxy = function (origin, interceptor) {
         var proxy = new Object();
-        for (var key in this.origin) {
-            var memberType = typeof this.origin[key];
+        for (var key in origin) {
+            var memberType = typeof origin[key];
             var strategy = this.getStrategy(memberType);
             strategy.apply(proxy, {
                 memberName: key,
-                origin: this.origin,
-                interceptors: this.intercepts
+                origin: origin,
+                interceptor: interceptor
             });
         }
         return proxy;
+    };
+    BenaluBuilder.prototype.build = function () {
+        var originObject = this.origin;
+        for (var _i = 0, _a = this.intercepts; _i < _a.length; _i++) {
+            var interceptor = _a[_i];
+            originObject = this.createProxy(originObject, interceptor);
+        }
+        return originObject;
     };
     BenaluBuilder.prototype.getStrategy = function (memberType) {
         if (memberType == "function") {
@@ -116,3 +119,4 @@ function fromInstance(instance) {
     return config;
 }
 exports.fromInstance = fromInstance;
+//# sourceMappingURL=benalu.js.map
