@@ -57,14 +57,8 @@ gulp.task("istanbul:hook", function() {
       .pipe(istanbul.hookRequire());
 });
 
-gulp.task("cover", function() {
-  if (!process.env.CI) return;
-  return gulp.src("coverage/**/lcov.info")
-      .pipe(coveralls());
-});
-
 gulp.task("test", function(cb) {
-  runSequence("istanbul:hook", "mocha", "cover", cb);
+  runSequence("istanbul:hook", "mocha", cb);
 });
 
 //******** DISTRIBUTION *************
