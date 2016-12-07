@@ -86,7 +86,7 @@ describe("BenaluProxy", () => {
         Chai.expect(numResult).eq(999);
     });
 
-    it.only("Should be able to use multiple interception", () => {
+    it("Should be able to use multiple interception", () => {
         let stub = new Stub();
 
         let proxy = Benalu.fromInstance(stub)
