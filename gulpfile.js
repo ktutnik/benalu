@@ -43,7 +43,7 @@ gulp.task("build", function(cb) {
 //******** TEST *************
 gulp.task("mocha", function() {
   return gulp.src([
-      "tests/**/*.test.js"
+      "test/**/*.test.js"
     ])
     .pipe(mocha({ui: "bdd"}))
     .pipe(istanbul.writeReports());
