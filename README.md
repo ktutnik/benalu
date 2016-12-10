@@ -1,5 +1,7 @@
 #Benalu
+
 [![Build Status](https://travis-ci.org/ktutnik/benalu.svg?branch=master)](https://travis-ci.org/ktutnik/benalu)
+[![Known Vulnerabilities](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af/badge.svg)](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af)
 
 A dynamic proxy for javascript. 
 Provide a light weight [proxy class](https://en.wikipedia.org/wiki/Proxy_pattern)
