@@ -4,6 +4,8 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af/badge.svg)](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af)
 [![codecov](https://codecov.io/gh/ktutnik/benalu/branch/master/graph/badge.svg)](https://codecov.io/gh/ktutnik/benalu)
 
+[![NPM](https://nodei.co/npm/benalu.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/benalu/)
+
 A dynamic proxy for javascript. 
 Provide a light weight [proxy class](https://en.wikipedia.org/wiki/Proxy_pattern)
 generator with multiple interception.
