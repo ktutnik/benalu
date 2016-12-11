@@ -5,7 +5,7 @@ var gulp        = require("gulp"),
     tsc         = require("gulp-typescript"),
     runSequence = require("run-sequence"),
     mocha       = require("gulp-mocha"),
-    istanbul    = require("gulp-istanbul")
+    istanbul    = require("gulp-istanbul");
 
 //******** BUILD *************
 
@@ -15,28 +15,46 @@ gulp.task("build-source", function() {
     return gulp.src([
         "src/**/**.ts"
     ])
-    .pipe(tsc(tsProject))
+    .pipe(tsTestProject())
     .on("error", function (err) {
         process.exit(1);
     })
-    .js.pipe(gulp.dest("src/"));
+    .pipe(gulp.dest("src/"));
 });
 
-var tsTestProject = tsc.createProject("tsconfig.json");
+var tsTestProject = tsc.createProject("tsconfig.json", {
+    declaration: false
+});
 
 gulp.task("build-test", function() {
     return gulp.src([
-        "tests/**/*.ts"
+        "test/*.ts"
     ])
-    .pipe(tsc(tsTestProject))
+    .pipe(tsTestProject())
     .on("error", function (err) {
         process.exit(1);
     })
-    .js.pipe(gulp.dest("tests/"));
+    .pipe(gulp.dest("test"));
+});
+
+var tsEs6 = tsc.createProject("tsconfig.json", {
+    target: "es6",
+    declaration: false
+});
+
+gulp.task("build-test-es6", function() {
+    return gulp.src([
+        "test/benaluproxy.es6.test.ts"
+    ])
+    .pipe(tsEs6())
+    .on("error", function (err) {
+        process.exit(1);
+    })
+    .pipe(gulp.dest("test"));
 });
 
 gulp.task("build", function(cb) {
-  runSequence("build-source", "build-test", cb);
+  runSequence("build-source", "build-test", "build-test-es6", cb);
 });
 
 

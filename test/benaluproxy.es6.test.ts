@@ -31,7 +31,7 @@ class Stub {
 }
 
 
-describe("BenaluProxy", () => {
+describe("BenaluProxy ES6 Build", () => {
     it("Should create a perfect copy of prototype function", () => {
         let stub = new Stub();
 
@@ -104,7 +104,7 @@ describe("BenaluProxy", () => {
         Chai.expect(numResult).eq(2);
     });
 
-    it.only("Should be able to intercept a getter", () => {
+    it("Should be able to intercept a getter", () => {
         let original = {
             data: 30
         };

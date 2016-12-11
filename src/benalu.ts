@@ -7,7 +7,7 @@ export interface Invocation {
     parameters: IArguments;
     returnValue?: any;
     memberType: MemberType;
-    proceed():void;
+    proceed(): void;
 }
 
 export interface InterceptionInfo {
@@ -15,9 +15,9 @@ export interface InterceptionInfo {
     interceptor: (invocation: Invocation) => void;
 }
 
-export interface MemberProxyStrategyInfo{
-    origin:any;
-    memberName:string;
+export interface MemberProxyStrategyInfo {
+    origin: any;
+    memberName: string;
     interceptor: (invocation: Invocation) => void;
 }
 
@@ -25,14 +25,16 @@ export interface MemberProxyStrategy {
     apply(proxy, info: MemberProxyStrategyInfo)
 }
 
+export class _BenaluProxy { }
+
 export class Interception {
-    info:InterceptionInfo;
-    constructor(info:InterceptionInfo){
+    info: InterceptionInfo;
+    constructor(info: InterceptionInfo) {
         this.info = info;
     }
-    
-    invoke(memberType:MemberType, originMemberInvoker: (parameters) => any,
-        parameters?:IArguments) {
+
+    invoke(memberType: MemberType, originMemberInvoker: (parameters) => any,
+        parameters?: any) {
         if (!this.info.interceptor) {
             return originMemberInvoker(parameters);
         }
@@ -41,7 +43,7 @@ export class Interception {
                 parameters: parameters,
                 memberType: memberType,
                 memberName: this.info.memberName,
-                proceed: function() {
+                proceed: function () {
                     this.returnValue =
                         originMemberInvoker(parameters)
                 }
@@ -55,7 +57,7 @@ export class Interception {
 export class MethodProxyStrategy implements MemberProxyStrategy {
     apply(proxy, info: MemberProxyStrategyInfo) {
         proxy[info.memberName] = ((info: MemberProxyStrategyInfo) => {
-            return function() {
+            return function () {
                 var interception = new Interception(info);
                 return interception.invoke(MemberType.Method, (parameters) => {
                     return (<Function>info.origin[info.memberName]).apply(info.origin, parameters);
@@ -70,7 +72,7 @@ export class PropertyProxyStrategy implements MemberProxyStrategy {
         Object.defineProperty(proxy, info.memberName, {
             enumerable: true,
             get: ((info: MemberProxyStrategyInfo) => {
-                return function() {
+                return function () {
                     var interception = new Interception(info);
                     return interception.invoke(MemberType.Getter, (parameters) => {
                         return info.origin[info.memberName];
@@ -78,7 +80,7 @@ export class PropertyProxyStrategy implements MemberProxyStrategy {
                 }
             })(info),
             set: ((info: MemberProxyStrategyInfo) => {
-                return function() {
+                return function () {
                     var interception = new Interception(info);
                     return interception.invoke(MemberType.Setter, (parameters) => {
                         info.origin[info.memberName] = parameters[0];
@@ -88,7 +90,6 @@ export class PropertyProxyStrategy implements MemberProxyStrategy {
         })
     }
 }
-
 
 export class BenaluBuilder<T> {
     origin: any;
@@ -103,23 +104,32 @@ export class BenaluBuilder<T> {
         return this;
     }
 
-    private createProxy(origin:any, interceptor: (invocation: Invocation) => void) : T{
-        let proxy = new Object();
-        for (let key in origin) {
-            var memberType = typeof origin[key];
-            var strategy = this.getStrategy(memberType);
-            strategy.apply(proxy, {
-                memberName: key,
-                origin: origin,
-                interceptor: interceptor
-            });
+    private createProxy(origin: any, interceptor: (invocation: Invocation) => void): T {
+        let proxy = new _BenaluProxy();
+        let members: string[];
+        if (origin.constructor.name == "_BenaluProxy") {
+            members = Object.keys(origin)
+        }
+        else {
+            members = Object.getOwnPropertyNames(Object.getPrototypeOf(origin));
+        }
+        for (let key of members) {
+            if (key != "constructor") {
+                var memberType = typeof origin[key];
+                var strategy = this.getStrategy(memberType);
+                strategy.apply(proxy, {
+                    memberName: key,
+                    origin: origin,
+                    interceptor: interceptor
+                });
+            }
         }
         return <T>proxy;
     }
 
     build(): T {
         let originObject = this.origin;
-        for(let interceptor of this.intercepts){
+        for (let interceptor of this.intercepts) {
             originObject = this.createProxy(originObject, interceptor);
         }
         return <T>originObject;
@@ -135,9 +145,9 @@ export class BenaluBuilder<T> {
     }
 }
 
-export function fromInstance<T>(instance:T){
+export function fromInstance<T>(instance: T) {
     let config = new BenaluBuilder<T>(instance);
-        return config;
+    return config;
 }
 
 

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ktutnik/benalu.svg?branch=master)](https://travis-ci.org/ktutnik/benalu)
 [![Known Vulnerabilities](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af/badge.svg)](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af)
-[![codecov](https://codecov.io/gh/ktutnik/benalu/branch/master/graph/badge.svg)](https://codecov.io/gh/ktutnik/benalu)
+[![Test Coverage](https://codeclimate.com/github/ktutnik/benalu/badges/coverage.svg)](https://codeclimate.com/github/ktutnik/benalu/coverage)
 
 [![NPM](https://nodei.co/npm/benalu.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/benalu/)
 

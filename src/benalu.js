@@ -5,6 +5,12 @@
     MemberType[MemberType["Setter"] = 2] = "Setter";
 })(exports.MemberType || (exports.MemberType = {}));
 var MemberType = exports.MemberType;
+var _BenaluProxy = (function () {
+    function _BenaluProxy() {
+    }
+    return _BenaluProxy;
+}());
+exports._BenaluProxy = _BenaluProxy;
 var Interception = (function () {
     function Interception(info) {
         this.info = info;
@@ -83,15 +89,25 @@ var BenaluBuilder = (function () {
         return this;
     };
     BenaluBuilder.prototype.createProxy = function (origin, interceptor) {
-        var proxy = new Object();
-        for (var key in origin) {
-            var memberType = typeof origin[key];
-            var strategy = this.getStrategy(memberType);
-            strategy.apply(proxy, {
-                memberName: key,
-                origin: origin,
-                interceptor: interceptor
-            });
+        var proxy = new _BenaluProxy();
+        var members;
+        if (origin.constructor.name == "_BenaluProxy") {
+            members = Object.keys(origin);
+        }
+        else {
+            members = Object.getOwnPropertyNames(Object.getPrototypeOf(origin));
+        }
+        for (var _i = 0, members_1 = members; _i < members_1.length; _i++) {
+            var key = members_1[_i];
+            if (key != "constructor") {
+                var memberType = typeof origin[key];
+                var strategy = this.getStrategy(memberType);
+                strategy.apply(proxy, {
+                    memberName: key,
+                    origin: origin,
+                    interceptor: interceptor
+                });
+            }
         }
         return proxy;
     };

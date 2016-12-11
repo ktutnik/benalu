@@ -1,7 +1,10 @@
 node_modules/*
 npm-debug.log
+src/*.js
+src/**/*.js
 src/*.js.map
-tests/*.js.map
+src/**/*.js.map
+src/*.d.ts
 typings
 .DS_Store
 coverage
