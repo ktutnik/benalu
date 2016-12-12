@@ -25,7 +25,14 @@ export interface MemberProxyStrategy {
     apply(proxy, info: MemberProxyStrategyInfo)
 }
 
-export class _BenaluProxy { }
+export function getMembers(origin) {
+    let members = Object.keys(origin);
+    let properties = Object.getOwnPropertyNames(Object.getPrototypeOf(origin));
+    members = members.concat(properties);
+    let conIndex = members.indexOf("constructor");
+    members.splice(conIndex, 1);
+    return members;
+}
 
 export class Interception {
     info: InterceptionInfo;
@@ -105,24 +112,16 @@ export class BenaluBuilder<T> {
     }
 
     private createProxy(origin: any, interceptor: (invocation: Invocation) => void): T {
-        let proxy = new _BenaluProxy();
-        let members: string[];
-        if (origin.constructor.name == "_BenaluProxy") {
-            members = Object.keys(origin)
-        }
-        else {
-            members = Object.getOwnPropertyNames(Object.getPrototypeOf(origin));
-        }
+        let proxy = {};
+        let members = getMembers(origin);
         for (let key of members) {
-            if (key != "constructor") {
-                var memberType = typeof origin[key];
-                var strategy = this.getStrategy(memberType);
-                strategy.apply(proxy, {
-                    memberName: key,
-                    origin: origin,
-                    interceptor: interceptor
-                });
-            }
+            var memberType = typeof origin[key];
+            var strategy = this.getStrategy(memberType);
+            strategy.apply(proxy, {
+                memberName: key,
+                origin: origin,
+                interceptor: interceptor
+            });
         }
         return <T>proxy;
     }

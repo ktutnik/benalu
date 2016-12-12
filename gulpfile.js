@@ -44,7 +44,7 @@ var tsEs6 = tsc.createProject("tsconfig.json", {
 
 gulp.task("build-test-es6", function() {
     return gulp.src([
-        "test/benaluproxy.es6.test.ts"
+        "test/*.es6.ts"
     ])
     .pipe(tsEs6())
     .on("error", function (err) {
@@ -61,7 +61,7 @@ gulp.task("build", function(cb) {
 //******** TEST *************
 gulp.task("mocha", function() {
   return gulp.src([
-      "test/**/*.test.js"
+      "test/**/*.js"
     ])
     .pipe(mocha({ui: "bdd"}))
     .pipe(istanbul.writeReports());

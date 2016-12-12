@@ -104,7 +104,7 @@ describe("BenaluProxy", () => {
         Chai.expect(numResult).eq(2);
     });
 
-    it.only("Should be able to intercept a getter", () => {
+    it("Should be able to intercept a getter", () => {
         let original = {
             data: 30
         };
