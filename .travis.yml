@@ -1,4 +1,7 @@
 language: node_js
+addons:
+    code_climate:
+        repo_token: 2b248f3c9a7b0fe2fbc117c9776ed12a22659e1c618a505b9f9c90d3571fe230
 node_js:
   - stable
 before_install:
