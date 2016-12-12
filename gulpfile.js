@@ -9,7 +9,9 @@ var gulp        = require("gulp"),
 
 //******** BUILD *************
 
-var tsProject = tsc.createProject("tsconfig.json");
+var tsProject = tsc.createProject("tsconfig.json", {
+    declaration: true
+});
 
 gulp.task("build-source", function() {
     return gulp.src([
@@ -23,7 +25,9 @@ gulp.task("build-source", function() {
 });
 
 var tsTestProject = tsc.createProject("tsconfig.json", {
-    declaration: false
+    declaration: true,
+    noResolve: false,
+    typescript: require("typescript") 
 });
 
 gulp.task("build-test", function() {
