@@ -1,5 +1,6 @@
 src
 tests
+test
 typings
 coverage
 tsconfig.json

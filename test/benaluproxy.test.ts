@@ -49,7 +49,7 @@ describe("BenaluProxy", () => {
     it("Should create perfect copy of object", () => {
         var object = {
             data: "THIS IS DATA",
-            getData: function() {
+            getData: function () {
                 return 300;
             }
         }
@@ -76,10 +76,7 @@ describe("BenaluProxy", () => {
         let stub = new Stub();
 
         let proxy = Benalu.fromInstance(stub)
-            .addInterception((i) => {
-                i.proceed();
-                i.returnValue = 999;
-            })
+            .addInterception((i) => 999)
             .build();
         let numResult = proxy.getNumber();
 
@@ -90,31 +87,22 @@ describe("BenaluProxy", () => {
         let stub = new Stub();
 
         let proxy = Benalu.fromInstance(stub)
-            .addInterception((i) => {
-                i.proceed();
-                i.returnValue = 1;
-            })
-            .addInterception((i) => {
-                i.proceed();
-                i.returnValue = i.returnValue + 1;
-            })
+            .addInterception((i) => i.proceed() + 1)
+            .addInterception((i) => 1)
             .build();
         let numResult = proxy.getNumber();
 
         Chai.expect(numResult).eq(2);
     });
 
-    it("Should be able to intercept a getter", () => {
+    /*it("Should be able to intercept a getter", () => {
         let original = {
             data: 30
         };
 
         let memberType;
         let proxy = Benalu.fromInstance(original)
-            .addInterception((i) => {
-                i.returnValue = 999;
-                memberType = i.memberType;
-            })
+            .addInterception((i) => 999)
             .build();
         let numResult = proxy.data;
 
@@ -152,5 +140,5 @@ describe("BenaluProxy", () => {
         proxy.changeData();
 
         Chai.expect(proxy.data).eq(999);
-    });
+    });*/
 });

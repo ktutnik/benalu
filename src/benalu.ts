@@ -1,29 +1,38 @@
-export enum MemberType {
-    Method, Getter, Setter
-}
+export type MemberType = "Method" | "Getter" | "Setter"
 
-export interface Invocation {
+export type Interceptor = (i: Invocation) => any
+
+export abstract class Invocation {
     memberName: string;
     parameters: IArguments;
-    returnValue?: any;
     memberType: MemberType;
-    proceed(): void;
+    abstract proceed(): any;
 }
 
-export interface InterceptionInfo {
-    memberName: string;
-    interceptor: (invocation: Invocation) => void;
+class MethodInvocation extends Invocation {
+    constructor(private original: any, public memberName: string, public parameters: IArguments) {
+        super()
+        this.memberType = "Method"
+    }
+
+    proceed() {
+        return this.original[this.memberName].apply(this.original, this.parameters)
+    }
 }
 
-export interface MemberProxyStrategyInfo {
-    origin: any;
-    memberName: string;
-    interceptor: (invocation: Invocation) => void;
+class InterceptorInvocation extends Invocation {
+    constructor(private next: Invocation, private interceptor: Interceptor) {
+        super();
+        this.memberName = next.memberName;
+        this.memberType = next.memberType;
+        this.parameters = next.parameters;
+    }
+
+    proceed() {
+        return this.interceptor(this.next)
+    }
 }
 
-export interface MemberProxyStrategy {
-    apply(proxy, info: MemberProxyStrategyInfo)
-}
 
 export function getMembers(origin) {
     let members = Object.keys(origin);
@@ -34,113 +43,41 @@ export function getMembers(origin) {
     return members;
 }
 
-export class Interception {
-    info: InterceptionInfo;
-    constructor(info: InterceptionInfo) {
-        this.info = info;
-    }
-
-    invoke(memberType: MemberType, originMemberInvoker: (parameters) => any,
-        parameters?: any) {
-        if (!this.info.interceptor) {
-            return originMemberInvoker(parameters);
-        }
-        else {
-            let invocation: Invocation = {
-                parameters: parameters,
-                memberType: memberType,
-                memberName: this.info.memberName,
-                proceed: function () {
-                    this.returnValue =
-                        originMemberInvoker(parameters)
-                }
-            };
-            this.info.interceptor(invocation);
-            return invocation.returnValue;
-        }
-    }
-}
-
-export class MethodProxyStrategy implements MemberProxyStrategy {
-    apply(proxy, info: MemberProxyStrategyInfo) {
-        proxy[info.memberName] = ((info: MemberProxyStrategyInfo) => {
-            return function () {
-                var interception = new Interception(info);
-                return interception.invoke(MemberType.Method, (parameters) => {
-                    return (<Function>info.origin[info.memberName]).apply(info.origin, parameters);
-                }, arguments)
-            }
-        })(info);
-    }
-}
-
-export class PropertyProxyStrategy implements MemberProxyStrategy {
-    apply(proxy, info: MemberProxyStrategyInfo) {
-        Object.defineProperty(proxy, info.memberName, {
-            enumerable: true,
-            get: ((info: MemberProxyStrategyInfo) => {
-                return function () {
-                    var interception = new Interception(info);
-                    return interception.invoke(MemberType.Getter, (parameters) => {
-                        return info.origin[info.memberName];
-                    });
-                }
-            })(info),
-            set: ((info: MemberProxyStrategyInfo) => {
-                return function () {
-                    var interception = new Interception(info);
-                    return interception.invoke(MemberType.Setter, (parameters) => {
-                        info.origin[info.memberName] = parameters[0];
-                    }, arguments);
-                }
-            })(info)
-        })
-    }
-}
-
 export class BenaluBuilder<T> {
     origin: any;
-    intercepts: Array<(invocation: Invocation) => void> = [];
+    intercepts: Array<Interceptor> = [];
 
     constructor(origin) {
         this.origin = origin
     }
 
-    addInterception(interception: (invocation: Invocation) => void) {
+    addInterception(interception: Interceptor) {
         this.intercepts.push(interception);
         return this;
     }
 
-    private createProxy(origin: any, interceptor: (invocation: Invocation) => void): T {
-        let proxy = {};
-        let members = getMembers(origin);
-        for (let key of members) {
-            var memberType = typeof origin[key];
-            var strategy = this.getStrategy(memberType);
-            strategy.apply(proxy, {
-                memberName: key,
-                origin: origin,
-                interceptor: interceptor
-            });
+    private methodInterception(origin:any, method:string, interceptors:Interceptor[]){
+        return function(){
+            let invocation:Invocation = new MethodInvocation(origin, method, arguments)
+            interceptors.forEach(x => {
+                invocation = new InterceptorInvocation(invocation, x)
+            })
+            return invocation.proceed();
         }
-        return <T>proxy;
     }
 
     build(): T {
-        let originObject = this.origin;
-        for (let interceptor of this.intercepts) {
-            originObject = this.createProxy(originObject, interceptor);
+        let proxy = {};
+        let members = getMembers(this.origin);
+        for (let key of members) {
+            if(typeof this.origin[key] == "function"){
+                proxy[key] = this.methodInterception(this.origin, key, this.intercepts.reverse())
+            }
+            else {
+                proxy[key] = this.origin[key]
+            }
         }
-        return <T>originObject;
-    }
-
-    private getStrategy(memberType: string): MemberProxyStrategy {
-        if (memberType == "function") {
-            return new MethodProxyStrategy()
-        }
-        else {
-            return new PropertyProxyStrategy();
-        }
+        return <T>proxy;
     }
 }
 
