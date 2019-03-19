@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ktutnik/benalu.svg?branch=master)](https://travis-ci.org/ktutnik/benalu)
 [![Known Vulnerabilities](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af/badge.svg)](https://snyk.io/test/github/ktutnik/benalu/61a461a5c488644682af5dee54e926d6ea3fe9af)
-[![Test Coverage](https://codeclimate.com/github/ktutnik/benalu/badges/coverage.svg)](https://codeclimate.com/github/ktutnik/benalu/coverage)
+[![Test Coverage](https://codeclimate.com/github/ktutnik/benalu/badges/coverage.svg)](https://codeclimate.com/github/ktutnik/benalu/coverage) [![Greenkeeper badge](https://badges.greenkeeper.io/ktutnik/benalu.svg)](https://greenkeeper.io/)
 
 Better ES6 Proxy API for interception
 
