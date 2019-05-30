@@ -22,7 +22,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
+    "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
     "gulp": "^4.0.0",
     "gulp-istanbul": "^1.1.1",
