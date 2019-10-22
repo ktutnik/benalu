@@ -21,7 +21,7 @@
   "author": "ktutnik",
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^4.1.7",
+    "@types/chai": "^4.2.4",
     "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
     "gulp": "^4.0.0",
